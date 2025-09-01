@@ -16,10 +16,11 @@ client = OpenAI(api_key=api_key)
 
 # --- Configuration ---
 CHUNK_SIZE = 600  # number of words per chunk
+MODEL_NAME = "gpt-4o"  # centralized model configuration
 
 # --- Precompiled regex patterns ---
-REF_PATTERN = re.compile(r"\[\^(\d+)\](?!:)")  # 注釈参照
-DEF_PATTERN = re.compile(r"\[\^(\d+)\]:")      # 注釈定義
+REF_PATTERN = re.compile(r"\[\^(\d+)\](?!:)")  # annotation reference
+DEF_PATTERN = re.compile(r"\[\^(\d+)\]:")      # annotation definition
 
 # --- Retry decorator ---
 def retry(max_attempts=3, delay=5):
@@ -37,7 +38,7 @@ def retry(max_attempts=3, delay=5):
 
 def detect_genre_intro(text: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model=MODEL_NAME,
         messages=[
             {
                 "role": "system",
@@ -150,7 +151,7 @@ def split_into_chunks(text: str, chunk_size: int = CHUNK_SIZE) -> List[str]:
 def annotate_chunk_with_prompt(chunk: str, prompt_template: str) -> str:
     prompt = prompt_template.format(chunk=chunk)
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model=MODEL_NAME,
         messages=[
             {
                 "role": "system",
